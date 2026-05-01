@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 
@@ -12,16 +13,21 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // In a real app, you'd validate credentials here
+  const handleLogin = async () => {
     if (email && password) {
-      login({ email }); // This triggers the navigation change to HomeScreen
+      setLoading(true);
+      try {
+        await login(email, password);
+      } catch (e) {
+      } finally {
+        setLoading(false);
+      }
     } else {
       alert("Please enter credentials");
     }
   };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
@@ -41,8 +47,16 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLogin}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Login</Text>
+        )}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
@@ -68,7 +82,7 @@ const styles = StyleSheet.create({
   input: {
     borderHeight: 1,
     borderColor: "#ddd",
-    borderWidth: 1,
+    // borderWidth: 1,
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,

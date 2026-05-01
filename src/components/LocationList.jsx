@@ -101,7 +101,7 @@ const LocationList = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { flex: 0, minHeight: 300 }]}>
       <View style={styles.header}>
         <Text style={styles.title}>Location Manager</Text>
         <TouchableOpacity
@@ -123,6 +123,7 @@ const LocationList = () => {
           data={locations}
           keyExtractor={(item) => item._id || item.id}
           renderItem={renderItem}
+          scrollEnabled={false}
         />
       )}
 
@@ -176,12 +177,12 @@ const LocationList = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  container: { padding: 20, backgroundColor: "#fff" },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
-    marginTop: 40,
+    // marginTop: 40,
   },
   title: { fontSize: 24, fontWeight: "bold" },
   addBtn: { backgroundColor: "#1890ff", padding: 10, borderRadius: 5 },

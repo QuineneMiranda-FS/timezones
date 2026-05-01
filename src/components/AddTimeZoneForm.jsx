@@ -14,17 +14,23 @@ const AddTimeZoneForm = ({ onAdd, locations }) => {
   const [cityName, setCityName] = useState("");
 
   const handleAdd = async () => {
-    if (!name || !fullName) return;
+    if (!name || !fullName || !cityName) return;
 
+    // Try to find the actual location record from the props
     const selectedLocation = locations.find(
-      (loc) => loc.cityName.toLowerCase() === cityName.toLowerCase(),
+      (loc) =>
+        loc.cityName.toLowerCase().trim() === cityName.toLowerCase().trim(),
     );
 
     const submissionValues = {
-      name,
+      name: name.toUpperCase(), // Ensure abbreviations are uppercase
       fullName,
       cityName: selectedLocation ? selectedLocation.cityName : cityName,
-      countryCode: "US",
+      // Pass the ID if found, so the backend can create a relationship
+      location: selectedLocation
+        ? selectedLocation._id || selectedLocation.id
+        : null,
+      countryCode: selectedLocation ? selectedLocation.countryCode : "US",
     };
 
     await onAdd(submissionValues);

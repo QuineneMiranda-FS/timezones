@@ -9,7 +9,6 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  ScrollView,
 } from "react-native";
 //Components
 import { useTimeZone } from "../hooks/useTimeZone";
@@ -101,18 +100,20 @@ const TimeZoneList = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Time Zone Manager</Text>
-
       <AddTimeZoneForm onAdd={addTimeZone} locations={locations} />
 
       {loading && <ActivityIndicator size="large" color="#0000ff" />}
 
-      <FlatList
-        data={timeZones}
-        keyExtractor={(item) => item._id || item.id}
-        renderItem={renderItem}
-        ListEmptyComponent={<Text>No time zones found.</Text>}
-      />
-
+      {/* Wrap FlatList to ensure it behaves within the HomeScreen flex layout */}
+      <View style={{ maxHeight: 400 }}>
+        <FlatList
+          data={timeZones}
+          keyExtractor={(item) => item._id || item.id}
+          renderItem={renderItem}
+          ListEmptyComponent={<Text>No time zones found.</Text>}
+          nestedScrollEnabled={true} // Add this if you keep it inside a ScrollView
+        />
+      </View>
       <Modal visible={isEditModalOpen} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>

@@ -5,27 +5,67 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
+import { useAuth } from "../context/AuthContext";
 
 export default function SignupScreen({ navigation }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // fix for Render "wake up" delay
+
+  const { register } = useAuth();
+
+  const handleSignup = async () => {
+    if (!name || !email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+    setLoading(true);
+    try {
+      await register(name, email, password);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
 
-      <TextInput style={styles.input} placeholder="Full Name" />
+      <TextInput
+        style={styles.input}
+        placeholder="Full Name"
+        value={name}
+        onChangeText={setName}
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
+        autoCapitalize="none"
       />
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: "#34C759" }]}>
-        <Text style={styles.buttonText}>Register</Text>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#34C759" }]}
+        onPress={handleSignup}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Register</Text>
+        )}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -34,28 +74,3 @@ export default function SignupScreen({ navigation }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 30,
-    textAlign: "center",
-  },
-  input: {
-    borderColor: "#ddd",
-    borderWidth: 1,
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  button: { padding: 15, borderRadius: 8, alignItems: "center" },
-  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  linkText: { color: "#007AFF", marginTop: 20, textAlign: "center" },
-});

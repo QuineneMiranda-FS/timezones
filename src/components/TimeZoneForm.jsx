@@ -12,14 +12,14 @@ import { useTimeZone } from "../hooks/useTimeZone";
 import AddTimeZoneForm from "../components/AddTimeZoneForm";
 
 function TimeZoneList() {
-  const { timeZones, loading, error, removeTimeZone, addTimeZone } =
+  const { timeZones, locations, loading, error, removeTimeZone, addTimeZone } =
     useTimeZone();
 
   if (loading && timeZones.length === 0) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" />
-        <Text>Loading time zones...</Text>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text>Waking up server...</Text>
       </View>
     );
   }
@@ -28,19 +28,24 @@ function TimeZoneList() {
     <View style={styles.container}>
       <Text style={styles.title}>Time Zone Manager</Text>
 
-      <AddTimeZoneForm onAdd={addTimeZone} />
+      <AddTimeZoneForm onAdd={addTimeZone} locations={locations} />
 
-      {error && <Text style={styles.errorText}>Error: {error.message}</Text>}
+      {error && <Text style={styles.errorText}>{error}</Text>}
 
       <FlatList
         data={timeZones}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => (item._id || item.id).toString()}
         renderItem={({ item }) => (
           <View style={styles.listItem}>
-            <Text style={styles.tzName}>{item.name}</Text>
+            <View>
+              <Text style={styles.tzName}>{item.name}</Text>
+              <Text style={{ fontSize: 12, color: "#666" }}>
+                {item.cityName}
+              </Text>
+            </View>
             <TouchableOpacity
               style={styles.deleteButton}
-              onPress={() => removeTimeZone(item.id)}
+              onPress={() => removeTimeZone(item._id || item.id)}
             >
               <Text style={styles.deleteText}>Delete</Text>
             </TouchableOpacity>

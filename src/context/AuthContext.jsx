@@ -1,36 +1,70 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import * as SecureStore from "expo-secure-store";
+import { API_BASE_URL } from "../config";
 
-// 1. Create the context
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // null = logged out
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 2. Simulate checking for an existing session on startup
   useEffect(() => {
-    const checkSession = async () => {
-      // Later, you'll use Expo SecureStore here to auto-login
+    const loadToken = async () => {
+      const token = await SecureStore.getItemAsync("userToken");
+      if (token) setUser({ token });
       setIsLoading(false);
     };
-    checkSession();
+    loadToken();
   }, []);
 
-  const login = (userData) => {
-    // In a real app, 'userData' would come from your backend/database
-    setUser(userData);
+  const register = async (name, email, password) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        await SecureStore.setItemAsync("userToken", data.token);
+        setUser({ token: data.token, ...data.user });
+      } else {
+        alert(data.message || "Signup failed");
+      }
+    } catch (error) {
+      alert("Server error. Please try again later.");
+    }
   };
 
-  const logout = () => {
+  const login = async (email, password) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        await SecureStore.setItemAsync("userToken", data.token);
+        setUser({ token: data.token, ...data.user });
+      } else {
+        alert(data.message || "Invalid credentials");
+      }
+    } catch (error) {
+      alert("Server error or cold start. Please try again.");
+    }
+  };
+
+  const logout = async () => {
+    await SecureStore.deleteItemAsync("userToken");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// 3. Custom hook for easy access in other files
 export const useAuth = () => useContext(AuthContext);

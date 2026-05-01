@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import * as api from "../API/locationAPI";
-import * as tzApi from "../API/timezoneAPI";
+import * as api from "../services/locationAPI";
+import * as tzApi from "../services/timezoneAPI";
 
 export const useLocation = () => {
   const [locations, setLocations] = useState([]);
@@ -35,7 +35,7 @@ export const useLocation = () => {
       setTimeZones(rawTzs);
     } catch (err) {
       console.error("Fetch Error:", err);
-      setError(err);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -90,7 +90,7 @@ export const useLocation = () => {
       );
       return updatedRecord;
     } catch (err) {
-      setError(err);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -102,7 +102,7 @@ export const useLocation = () => {
       await api.deleteLocationById(id);
       setLocations((prev) => prev.filter((loc) => (loc._id || loc.id) !== id));
     } catch (err) {
-      setError(err);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
