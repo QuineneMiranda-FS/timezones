@@ -48,7 +48,7 @@
     },
     "owner": "mequinene",
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "sdkVersion"
     },
     "updates": {
       "url": "https://u.expo.dev/6d2fcb72-8336-4cde-931f-347550bbfff9"
