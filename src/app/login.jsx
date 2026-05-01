@@ -9,11 +9,15 @@ import {
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 
-export default function LoginScreen({ navigation }) {
+import { useRouter } from "expo-router";
+
+export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const handleLogin = async () => {
     if (email && password) {
@@ -21,6 +25,7 @@ export default function LoginScreen({ navigation }) {
       try {
         await login(email, password);
       } catch (e) {
+        alert("Login failed. Check your credentials.");
       } finally {
         setLoading(false);
       }
@@ -36,7 +41,6 @@ export default function LoginScreen({ navigation }) {
       <TextInput
         style={styles.input}
         placeholder="Email"
-        placeholderTextColor="#999"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
@@ -45,7 +49,6 @@ export default function LoginScreen({ navigation }) {
       <TextInput
         style={styles.input}
         placeholder="Password"
-        placeholderTextColor="#999"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -63,7 +66,8 @@ export default function LoginScreen({ navigation }) {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
+      {/* 3. Update navigation to use router.push */}
+      <TouchableOpacity onPress={() => router.push("/signup")}>
         <Text style={styles.linkText}>Don't have an account? Sign up</Text>
       </TouchableOpacity>
     </View>
@@ -102,14 +106,6 @@ const styles = StyleSheet.create({
     height: 55,
     justifyContent: "center",
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  linkText: {
-    color: "#007AFF",
-    marginTop: 20,
-    textAlign: "center",
-  },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  linkText: { color: "#007AFF", marginTop: 20, textAlign: "center" },
 });

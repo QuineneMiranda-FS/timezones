@@ -9,12 +9,16 @@ import {
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 
-export default function SignupScreen({ navigation }) {
+import { useRouter } from "expo-router";
+
+export default function SignupScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
+
+  const router = useRouter();
 
   const handleSignup = async () => {
     if (!name || !email || !password) {
@@ -25,6 +29,7 @@ export default function SignupScreen({ navigation }) {
     try {
       await register(name, email, password);
     } catch (error) {
+      alert("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -37,24 +42,19 @@ export default function SignupScreen({ navigation }) {
       <TextInput
         style={styles.input}
         placeholder="Full Name"
-        placeholderTextColor="#999"
         value={name}
         onChangeText={setName}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Email"
-        placeholderTextColor="#999"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
       />
-
       <TextInput
         style={styles.input}
         placeholder="Password"
-        placeholderTextColor="#999"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -72,7 +72,8 @@ export default function SignupScreen({ navigation }) {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.goBack()}>
+      {/* 3. Use router.back() to go back to Login */}
+      <TouchableOpacity onPress={() => router.back()}>
         <Text style={styles.linkText}>Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
@@ -111,14 +112,6 @@ const styles = StyleSheet.create({
     height: 55,
     justifyContent: "center",
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  linkText: {
-    color: "#007AFF",
-    marginTop: 20,
-    textAlign: "center",
-  },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  linkText: { color: "#007AFF", marginTop: 20, textAlign: "center" },
 });
