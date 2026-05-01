@@ -13,8 +13,7 @@ export default function SignupScreen({ navigation }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // fix for Render "wake up" delay
-
+  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
 
   const handleSignup = async () => {
@@ -38,26 +37,31 @@ export default function SignupScreen({ navigation }) {
       <TextInput
         style={styles.input}
         placeholder="Full Name"
+        placeholderTextColor="#999"
         value={name}
         onChangeText={setName}
       />
+
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor="#999"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
       />
+
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor="#999"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: "#34C759" }]}
+        style={styles.button}
         onPress={handleSignup}
         disabled={loading}
       >
@@ -74,3 +78,47 @@ export default function SignupScreen({ navigation }) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    padding: 20,
+  },
+  input: {
+    backgroundColor: "#f9f9f9",
+    borderColor: "#ddd",
+    borderWidth: 1,
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
+    color: "#000",
+    height: 55,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#000",
+    marginBottom: 30,
+    textAlign: "center",
+  },
+  button: {
+    backgroundColor: "#34C759",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    height: 55,
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  linkText: {
+    color: "#007AFF",
+    marginTop: 20,
+    textAlign: "center",
+  },
+});

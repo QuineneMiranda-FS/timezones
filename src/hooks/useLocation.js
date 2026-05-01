@@ -80,16 +80,20 @@ export const useLocation = () => {
     setLoading(true);
     try {
       const { _id, __v, id: redundantId, ...payload } = data;
+
       const res = await api.updateLocationById(id, payload);
       const updatedRecord = res.data?.data || res.data;
 
       setLocations((prev) =>
-        prev.map((loc) =>
-          (loc._id || loc.id) === id ? { ...loc, ...updatedRecord } : loc,
-        ),
+        prev.map((loc) => {
+          const currentId = (loc._id || loc.id)?.toString();
+          const targetId = id?.toString();
+          return currentId === targetId ? { ...loc, ...updatedRecord } : loc;
+        }),
       );
       return updatedRecord;
     } catch (err) {
+      console.error("Update Location Error:", err);
       setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);

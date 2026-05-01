@@ -73,31 +73,39 @@ export const useTimeZone = () => {
   const updateTimeZone = async (id, data) => {
     setLoading(true);
     try {
-      const { _id, __v, ...updateData } = data;
-      const cityName = Array.isArray(data.location)
-        ? data.location[0]
-        : data.location;
-      const payload = { ...updateData, cityName };
+      const { _id, __v, id: oldId, ...updateData } = data;
+      const res = await api.updateTimeZoneById(id, updateData);
 
-      const res = await api.updateTimeZoneById(id, payload);
       const updatedRecord = res.data?.data || res.data;
 
       const cityMatch = locations.find(
-        (loc) => String(loc.timeZoneId) === String(id),
+        (loc) => String(loc.timeZoneId || loc._id || loc.id) === String(id),
       );
 
       const enrichedUpdate = {
         ...updatedRecord,
-        id: updatedRecord._id || id,
-        cityName: cityMatch ? cityMatch.cityName : cityName || "Unknown City",
+        id: updatedRecord._id || updatedRecord.id || id,
+        cityName: cityMatch
+          ? cityMatch.cityName
+          : data.cityName || "Updated City",
       };
 
-      setTimeZones((prev) => {
-        return prev.map((tz) => (tz.id === id ? enrichedUpdate : tz));
-      });
+      setTimeZones((prev) =>
+        prev.map((tz) => {
+          const currentId = (tz._id || tz.id)?.toString();
+          const targetId = id?.toString();
+          return currentId === targetId ? enrichedUpdate : tz;
+        }),
+      );
+
+      return updatedRecord;
     } catch (err) {
-      Alert.alert("Update Failed", "Check your connection and try again.");
-      setError(err);
+      console.error("Update Failed:", err);
+      Alert.alert(
+        "Update Failed",
+        err.response?.data?.message || "Check your connection.",
+      );
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }

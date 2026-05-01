@@ -18,13 +18,22 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const register = async (name, email, password) => {
+    const controller = new AbortController();
+    // Set a long timeout (60 seconds) specifically for Render cold starts
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+
     try {
       const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
+
       const data = await response.json();
+
       if (response.ok) {
         await SecureStore.setItemAsync("userToken", data.token);
         setUser({ token: data.token, ...data.user });
@@ -32,7 +41,15 @@ export const AuthProvider = ({ children }) => {
         alert(data.message || "Signup failed");
       }
     } catch (error) {
-      alert("Server error. Please try again later.");
+      if (error.name === "AbortError") {
+        alert(
+          "Server is still waking up. Your account was likely created; try logging in now.",
+        );
+      } else {
+        alert(
+          "Server response timed out, but please try logging in with those credentials.",
+        );
+      }
     }
   };
 

@@ -43,27 +43,28 @@ const LocationList = () => {
     });
     setIsModalOpen(true);
   };
-
   const handleSave = async () => {
-    if (!formData.cityName || !formData.countryCode || !formData.timeZoneId) {
-      Alert.alert("Error", "Please fill all fields");
-      return;
-    }
-
     try {
       if (editingRecord) {
-        await updateLocation(editingRecord._id || editingRecord.id, formData);
+        const id = editingRecord._id || editingRecord.id;
+        await updateLocation(id, formData);
       } else {
-        await addLocation(formData);
+        // Calculate ID automatically
+        const nextId =
+          locations.length > 0
+            ? Math.max(...locations.map((l) => parseInt(l.timeZoneId) || 0)) + 1
+            : 1;
+
+        await addLocation({
+          ...formData,
+          timeZoneId: nextId.toString(),
+        });
       }
-      if (refresh) await refresh();
       setIsModalOpen(false);
-      setFormData({ cityName: "", countryCode: "", timeZoneId: "" });
     } catch (error) {
-      console.error("Save Failed:", error);
+      console.error(error);
     }
   };
-
   const confirmDelete = (id) => {
     Alert.alert("Delete", "Delete this location?", [
       { text: "Cancel", style: "cancel" },
@@ -101,7 +102,7 @@ const LocationList = () => {
   };
 
   return (
-    <View style={[styles.container, { flex: 0, minHeight: 300 }]}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Location Manager</Text>
         <TouchableOpacity
@@ -137,6 +138,7 @@ const LocationList = () => {
             <TextInput
               style={styles.input}
               placeholder="City Name"
+              placeholderTextColor="#999"
               value={formData.cityName}
               onChangeText={(text) =>
                 setFormData({ ...formData, cityName: text })
@@ -145,19 +147,10 @@ const LocationList = () => {
             <TextInput
               style={styles.input}
               placeholder="Country Code (e.g. US)"
+              placeholderTextColor="#999"
               value={formData.countryCode}
               onChangeText={(text) =>
                 setFormData({ ...formData, countryCode: text })
-              }
-            />
-
-            <Text style={styles.label}>Timezone ID:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. 1"
-              value={formData.timeZoneId?.toString()}
-              onChangeText={(text) =>
-                setFormData({ ...formData, timeZoneId: text })
               }
             />
 

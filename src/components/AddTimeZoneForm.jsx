@@ -16,17 +16,15 @@ const AddTimeZoneForm = ({ onAdd, locations }) => {
   const handleAdd = async () => {
     if (!name || !fullName || !cityName) return;
 
-    // Try to find the actual location record from the props
     const selectedLocation = locations.find(
       (loc) =>
         loc.cityName.toLowerCase().trim() === cityName.toLowerCase().trim(),
     );
 
     const submissionValues = {
-      name: name.toUpperCase(), // Ensure abbreviations are uppercase
+      name: name.toUpperCase(),
       fullName,
       cityName: selectedLocation ? selectedLocation.cityName : cityName,
-      // Pass the ID if found, so the backend can create a relationship
       location: selectedLocation
         ? selectedLocation._id || selectedLocation.id
         : null,
@@ -46,25 +44,26 @@ const AddTimeZoneForm = ({ onAdd, locations }) => {
         <TextInput
           style={[styles.input, { flex: 1 }]}
           placeholder="Abbr (EST)"
+          placeholderTextColor="#999"
           value={name}
           onChangeText={setName}
           autoCapitalize="characters"
         />
         <TextInput
           style={[styles.input, { flex: 2 }]}
-          placeholder="Full Name (IANA)"
+          placeholder="Full Name (e.g. America/New_York)"
+          placeholderTextColor="#999"
           value={fullName}
           onChangeText={setFullName}
         />
       </View>
-
       <TextInput
         style={styles.input}
-        placeholder="City Name (e.g. New York)"
+        placeholder="City Name"
+        placeholderTextColor="#999"
         value={cityName}
         onChangeText={setCityName}
       />
-
       <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
         <Text style={styles.buttonText}>Add Time Zone</Text>
       </TouchableOpacity>

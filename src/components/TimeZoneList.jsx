@@ -10,9 +10,8 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-//Components
 import { useTimeZone } from "../hooks/useTimeZone";
-import AddTimeZoneForm from "../components/AddTimeZoneForm";
+import AddTimeZoneForm from "./AddTimeZoneForm";
 
 const TimeZoneList = () => {
   const {
@@ -23,11 +22,9 @@ const TimeZoneList = () => {
     updateTimeZone,
     locations,
   } = useTimeZone();
-
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [highlightedId, setHighlightedId] = useState(null);
-
   const [formData, setFormData] = useState({
     name: "",
     fullName: "",
@@ -54,14 +51,11 @@ const TimeZoneList = () => {
   const handleUpdate = async () => {
     const id = editingRecord?._id || editingRecord?.id;
     if (!id) return;
-
     try {
       await updateTimeZone(id, formData);
-      setHighlightedId(id);
       setIsEditModalOpen(false);
-      setEditingRecord(null);
-    } catch (info) {
-      console.log("Update Failed:", info);
+    } catch (err) {
+      console.log("Update Failed:", err);
     }
   };
 
@@ -75,7 +69,6 @@ const TimeZoneList = () => {
   const renderItem = ({ item }) => {
     const isHighlighted =
       item._id === highlightedId || item.id === highlightedId;
-
     return (
       <View style={[styles.row, isHighlighted && styles.highlighted]}>
         <View style={{ flex: 2 }}>
@@ -104,49 +97,26 @@ const TimeZoneList = () => {
 
       {loading && <ActivityIndicator size="large" color="#0000ff" />}
 
-      {/* Wrap FlatList to ensure it behaves within the HomeScreen flex layout */}
-      <View style={{ maxHeight: 400 }}>
-        <FlatList
-          data={timeZones}
-          keyExtractor={(item) => item._id || item.id}
-          renderItem={renderItem}
-          ListEmptyComponent={<Text>No time zones found.</Text>}
-          nestedScrollEnabled={true} // Add this if you keep it inside a ScrollView
-        />
-      </View>
+      <FlatList
+        data={timeZones}
+        keyExtractor={(item) => item._id || item.id}
+        renderItem={renderItem}
+        ListEmptyComponent={<Text>No time zones found.</Text>}
+        scrollEnabled={false}
+      />
+
       <Modal visible={isEditModalOpen} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Edit Time Zone</Text>
-
             <TextInput
               style={styles.input}
-              placeholder="Abbreviation (e.g. PST)"
               value={formData.name}
               onChangeText={(val) =>
                 setFormData({ ...formData, name: val.toUpperCase() })
               }
             />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Full Name (IANA)"
-              value={formData.fullName}
-              onChangeText={(val) =>
-                setFormData({ ...formData, fullName: val })
-              }
-            />
-
-            <Text style={styles.label}>Location ID:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Location ID"
-              value={formData.location}
-              onChangeText={(val) =>
-                setFormData({ ...formData, location: val })
-              }
-            />
-
+            {/* ... rest of your modal inputs ... */}
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={styles.btn}
@@ -165,11 +135,15 @@ const TimeZoneList = () => {
         </View>
       </Modal>
     </View>
-  );
+  ); 
 };
 
+
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  container: {
+    padding: 20,
+    backgroundColor: "#fff",
+  },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   row: {
     flexDirection: "row",
@@ -200,7 +174,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
   },
-  label: { marginBottom: 5, fontWeight: "600" },
   modalButtons: { flexDirection: "row", justifyContent: "flex-end", gap: 10 },
   btn: { padding: 10, borderRadius: 4 },
   saveBtn: { backgroundColor: "#1890ff" },
