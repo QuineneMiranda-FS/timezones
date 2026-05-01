@@ -5,8 +5,7 @@
     "version": "1.0.0",
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true,
-      "newArchEnabled": true
+      "reactCompiler": true
     },
     "android": {
       "adaptiveIcon": {
